@@ -13,21 +13,26 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.time.LocalDate;
+import java.util.List;
 
-//@Controller
+@Controller
 @SessionAttributes("username")
-public class TodoController {
+public class TodoControllerJpa {
 
-    private final TodoService todoService;
+    
+    private final TodoRepository todoRepository;
 
-    public TodoController(final TodoService todoService) {
-        this.todoService = todoService;
+    public TodoControllerJpa(final TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
     }
 
 
     @RequestMapping("list-todos")
     public String listAllTodos(ModelMap modelMap) {
-        List<Todo> todos = todoService.findByUsername(getLoggedInUsername());
+        final String username = getLoggedInUsername();
+        List<Todo> todos = todoRepository.findByUsername(username);
         modelMap.addAttribute("todos", todos);
         return "listTodos";
     }
@@ -44,19 +49,21 @@ public class TodoController {
         if (result.hasErrors()) {
             return "todo";
         }
-        todoService.addTodo(getLoggedInUsername(), todo.getDescription(), todo.getTargetDate(), false);
+
+        todoRepository.save(new Todo(0, getLoggedInUsername(), todo.getDescription(), todo.getTargetDate(), false));
         return "redirect:list-todos";
     }
 
     @RequestMapping("delete-todo")
     public String deleteTodo(@RequestParam int id) {
-        todoService.deleteById(id);
+        todoRepository.deleteById(id);
         return "redirect:list-todos";
     }
 
     @RequestMapping(value = "update-todo", method = RequestMethod.GET)
     public String showUpdateTodoPage(final ModelMap modelMap, @RequestParam int id) {
-        final Todo todo = todoService.findById(id);
+        final Optional<Todo> todoOpt = todoRepository.findById(id);
+        final Todo todo = todoOpt.get();
         modelMap.addAttribute("todo", todo);
         return "todo";
     }
@@ -67,7 +74,7 @@ public class TodoController {
             return "todo";
         }
         todo.setUsername(getLoggedInUsername());
-        todoService.updateTodo(todo);
+        todoRepository.save(todo);
         return "redirect:list-todos";
     }
 

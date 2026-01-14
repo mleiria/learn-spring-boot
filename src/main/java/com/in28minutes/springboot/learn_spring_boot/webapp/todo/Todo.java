@@ -1,17 +1,27 @@
 package com.in28minutes.springboot.learn_spring_boot.webapp.todo;
 
+import jakarta.annotation.Generated;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+@Entity
 public class Todo {
 
+    @Id
+    @GeneratedValue
     private int id;
     private String username;
     @Size(min = 10, message = "Enter at least 10 characters")
     private String description;
     private LocalDate targetDate;
     private boolean done;
+
+    public Todo() {
+    }
 
     public Todo(int id, String username, String description, LocalDate targetDate, boolean done) {
         this.id = id;
@@ -58,11 +68,12 @@ public class Todo {
     }
 
     public void setDone(boolean done) {
-         this.done = done;
+        this.done = done;
     }
 
     @Override
     public String toString() {
-        return "id: " + id + ", username: " + username + ", description: " + description + ", targetDate: " + targetDate + ", done: " +   done + "\n";
+        return "id: " + id + ", username: " + username + ", description: " + description + ", targetDate: " + targetDate
+                + ", done: " + done + "\n";
     }
 }
